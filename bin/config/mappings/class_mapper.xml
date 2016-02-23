@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="class">
+	<resultMap type="Classes" id="class_rmap_1">
+		<id property="cid" column="class_id" />
+		<result property="cname" column="class_name" />
+		<association property="cteacher" column="teacher_id"
+			select="getTeacherById" />
+	</resultMap>
+	<resultMap type="Teacher" id="teacher_rmap">
+		<id property="tid" column="teacher_id" />
+		<result property="tname" column="teacher_name" />
+	</resultMap>
+	<resultMap id="class_rmap_2" type="Classes">
+		<id property="cid" column="class_id" />
+		<result property="cname" column="class_name" />
+		<association property="cteacher" javaType="Teacher">
+			<id property="tid" column="teacher_id" />
+			<result property="tname" column="teacher_name" />
+		</association>
+	</resultMap>
+	<resultMap id="class_rmap_3" type="Classes">
+	    <id property="cid" column="class_id" /> 
+	    <result property="cname" column="class_name" />
+	    <association property="cteacher" javaType="Teacher">
+	           <id property="tid" column="teacher_id" />
+	           <result property="tname" column="teacher_name" />
+	    </association>
+	    <collection property="cstudents" column="class_id" ofType="Student">
+	           <id property="sid" column="student_id" />
+	           <result property="sname" column="student_name" />
+	           <result property="sclass" column="class_id" /> 
+	    </collection>
+	</resultMap>
+	<resultMap id="class_rmap_4" type="Classes">
+	    <id property="cid" column="class_id" />
+	    <result property="cname" column="class_name" />
+	    <association property="cteacher" column="teacher_id" select="getTeacherById" javaType="Teacher"/>
+	    <collection property="cstudents" column="class_id" ofType="Student" select="getStudentsByCId" />
+	</resultMap>
+	
+	
+	
+
+	<select id="getClassById_1" parameterType="String" resultMap="class_rmap_1">
+		select * from class_test where class_id = #{id}
+	</select>
+	<select id="getClassById_2" parameterType="String" resultMap="class_rmap_2">
+		select * from teacher_test t,class_test c where c.class_id=#{id} and
+		c.teacher_id=t.teacher_id
+	</select>
+    <select id="getClassById_3" parameterType="String" resultMap="class_rmap_3">
+        select * from teacher_test t,class_test c,students_test s where 
+        t.teacher_id=c.teacher_id and s.class_id=c.class_id and c.class_id=#{id}
+    </select>  
+    <select id="getClassById_4" parameterType="String" resultMap="class_rmap_4">
+        select * from class_test where class_id=#{id}
+    </select>
+	<select id="getTeacherById" parameterType="String" resultMap="teacher_rmap">
+		select * from teacher_test where teacher_id= #{id}
+	</select>
+    <select id="getStudentsByCId" parameterType="String" resultType="Student">
+        select student_id sid,student_name sname,class_id sclass from students_test where class_id=#{id}
+    </select>
+</mapper>
